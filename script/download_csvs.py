@@ -18,6 +18,20 @@ def create_dir(path: str) -> bool:
     print(f"Directory {path} create with sucess")
     return True
 
+def delete_file(path: str) -> None:
+    try:
+        os.remove(path)
+        print(f"File {path} deleted with sucess")
+    except FileNotFoundError as e:
+        print(f"{path} not exists")
+
+def delete_dir(path: str) -> None:
+    try:
+        os.removedirs(path)
+        print(f"Directory {path} deleted with sucess")
+    except FileNotFoundError as e:
+        print(f"{path} not exists")
+
 def extract_drive_id(url: str) -> str:
     return url.split("/d/")[1].split("/")[0]
     
@@ -46,6 +60,8 @@ def extract_zip(zip_path:str, path_extract:str) -> None:
         print(f"{zip_path} extract to {path_extract}")
     except Exception as e:
         print(f"Error in extracting zip - {e}")
+    finally:
+        delete_file(zip_path)
 
 def request_page(url, headers=None) -> BeautifulSoup:
     try:
@@ -73,6 +89,7 @@ def main() -> None:
     number_files(drive_links)
     create_dir(DIR_ZIP)
     create_dir(DIR_DATA_CSVS)
+
     for link in drive_links:
         file_id = extract_drive_id(link)
         file_name = f"{file_id}.zip"
@@ -81,6 +98,7 @@ def main() -> None:
         download_drive_file(file_id, path)
         extract_zip(path, DIR_DATA_CSVS)
 
+    delete_dir(DIR_ZIP)
+
 if __name__ == "__main__":
     main()
-    
